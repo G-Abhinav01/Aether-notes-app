@@ -2,6 +2,16 @@
 Branch-structured mobile notes + task manager (React Native)
 
 
+> ⚠️ **Notice**: This project is a private product-in-development.  
+> While the repository is public for review, all rights are reserved. Do not copy, reuse, or redistribute any part of this codebase.
+
+
+
+
+
+
+
+
 ---
 
 ## 🔒 License & Usage Notice
