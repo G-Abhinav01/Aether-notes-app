@@ -117,7 +117,7 @@ Current status: UI Scaffolding → State Logic Integration → Firebase Sync
 
 - 📜 **License**: All Rights Reserved  
 - ❌ No reuse, redistribution, or commercial use allowed  
-- 📩 Contact author for permission: [@achiver on GitHub](https://github.com/achiver)
+- 📩 Contact author for permission: [@Abhinav on GitHub](https://github.com/G-Abhinav01)
 
 ---
 
@@ -131,13 +131,13 @@ Current status: UI Scaffolding → State Logic Integration → Firebase Sync
 ## 👨‍💻 Author
 
 Built by **G Abhinav**  
-Devlog & Showcase: [LinkedIn](https://linkedin.com/in/your-handle) · [GitHub](https://github.com/achiver)
+Devlog & Showcase: [LinkedIn]([https://linkedin.com/in/your-handle](https://www.linkedin.com/in/g-abhinav-138a39252/)) · [GitHub](https://github.com/G-Abhinav01)
 
 ---
 
 ## 🛠️ Build With
 
-> Initial scaffold powered by [Trae](https://trae.ai) / [Void IDE](https://void.tools)  
+> Initial scaffold powered by [VS Code](https://code.visualstudio.com/)   
 > Manual logic, UI design, and integrations crafted from scratch
 
 ---
@@ -157,4 +157,4 @@ This project is shared for demonstration and portfolio review purposes only.
 All rights reserved.  
 Commercial or derivative use of the code, design, or concepts is **strictly prohibited** without prior written permission from the author.
 
-© 2025 G Abhinav (@achiver)
+© 2025 G Abhinav (@Abhinav)
