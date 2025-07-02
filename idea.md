@@ -10,7 +10,7 @@ As a student and content enthusiast, I found myself constantly juggling between 
 
 - Organizing semester notes with proper hierarchy (Semester → Subjects → Chapters)
 - Storing both handwritten notes (as images) and digital notes together
-- Managing my anime/manga/drama/novels tracking with nested categories and organized subcategories inside major category like J-content for instance.
+- Managing my anime/manga tracking with nested categories
 - Keeping everything searchable and properly tagged
 
 Existing solutions were either too simple (like flat-list note apps) or too complex (like full-blown productivity suites). That's when I decided to build Aether — the note-taking app I always wished I had.

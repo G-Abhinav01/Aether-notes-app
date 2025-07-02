@@ -50,8 +50,8 @@ web_modules/
 # Optional npm cache directory
 .npm
 
-# Local idea file
-idea_local.md
+# Local files
+ignored_files/
 
 # Optional eslint cache
 .eslintcache
