@@ -131,7 +131,7 @@ Current status: UI Scaffolding → State Logic Integration → Firebase Sync
 ## 👨‍💻 Author
 
 Built by **G Abhinav**  
-Devlog & Showcase: [LinkedIn]([https://linkedin.com/in/your-handle](https://www.linkedin.com/in/g-abhinav-138a39252/)) · [GitHub](https://github.com/G-Abhinav01)
+Devlog & Showcase: [LinkedIn](https://www.linkedin.com/in/g-abhinav-138a39252/) · [GitHub](https://github.com/G-Abhinav01)
 
 ---
 
