@@ -1,4 +1,4 @@
-import NoteListScreen from '../../../screens/NoteListScreen';
+import NoteListScreen from '../../screens/NoteListScreen';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function NoteList() {

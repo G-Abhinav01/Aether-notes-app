@@ -1,4 +1,4 @@
-import NoteDetailScreen from '../../../../screens/NoteDetailScreen';
+import NoteDetailScreen from '../../../screens/NoteDetailScreen';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function NoteDetail() {
