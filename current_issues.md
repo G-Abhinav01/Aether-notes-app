@@ -4,7 +4,7 @@ This document outlines the ongoing issues encountered during the development of 
 
 ## 1. Persistent Blank White Screen on Web
 
-**Issue:** The application displays a blank white screen when run on the web platform (`http://localhost:8081`). This issue has persisted despite multiple attempts to resolve it.
+**Issue:** The primary issue is now a persistent `tailwindConfigV3` error with NativeWind, which prevents proper styling. The blank white screen issue on the web platform has been resolved.
 
 **Why it arose:**
 - Initially, it was suspected to be an incorrect `main` entry point in `package.json`.
@@ -20,8 +20,11 @@ This document outlines the ongoing issues encountered during the development of 
 - Reinstalled `expo-router` (`npm install expo-router@latest`).
 
 **Current State:**
-- Attempted to set `EXPO_ROUTER_IMPORT_MODE` environment variable to `react-native-web` to address web-specific bundling issues.
-- Attempted to add `@babel/plugin-transform-export-namespace-from` to `babel.config.js` to address syntax errors.
-- Corrected import paths in `app/notes/[folderId].tsx` and `app/notes/detail/[noteId].tsx`.
-- The Expo server starts successfully, and the web preview URL is available.
-- Blank screen on web build: The issue has been resolved in the `Aether` project by updating `package.json` to remove unnecessary polyfills and align `react` and `react-dom` versions with the working `test-router-app-new` project. The Expo server now starts successfully, and the web preview displays correctly.
+- The blank screen issue on the web build has been resolved by updating `package.json` to remove unnecessary polyfills and align `react` and `react-dom` versions. The Expo server now starts successfully, and the web preview displays correctly.
+- However, the `tailwindConfigV3` error persists, despite:
+    - Updating and downgrading `nativewind`.
+    - Modifying `metro.config.js` and `tailwind.config.js` configurations.
+    - Reinstalling `tailwindcss` and `postcss`.
+    - Clearing npm cache.
+    - Creating `postcss.config.js`.
+- A new minimal Expo project (`AetherNewMinimal`) has been created to isolate and troubleshoot the NativeWind issue.

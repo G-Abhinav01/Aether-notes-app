@@ -1,13 +1,26 @@
 import React from 'react';
-import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 const SearchScreen = () => {
   return (
-    <View className="flex-1 justify-center items-center bg-gray-900">
-      <Text className="text-white text-xl">Search Screen</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>Search Screen</Text>
+      {/* TODO: Implement search functionality */}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+  },
+  text: {
+    color: 'white',
+    fontSize: 24,
+  },
+});
 
 export default SearchScreen;

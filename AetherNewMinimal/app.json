@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "test-router-app-new",
-    "slug": "test-router-app-new",
+    "name": "AetherNewMinimal",
+    "slug": "AetherNewMinimal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "testrouterappnew",
+    "scheme": "aethernewminimal",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
