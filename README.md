@@ -196,7 +196,7 @@ Older versions are preserved in the repository under the `legacy/react-native` b
 
 ---
 
-## 💡 Notes for Developers
+## 💡 Notes for Developers 
 
 The new Flutter codebase is structured following best practices including separation of concerns, state management (e.g., Provider, Riverpod, or Bloc depending on your choice), and platform-agnostic UI.
 
