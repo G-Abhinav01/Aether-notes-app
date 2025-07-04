@@ -3,12 +3,13 @@
 ## 1. UI Scaffolding
 
 -   **Core Screens:**
-    -   `FolderListScreen`: Displays a list of note folders.
-    -   `NoteListScreen`: Shows notes within a selected folder.
-    -   `NoteDetailScreen`: For viewing and editing individual notes.
-    -   `TaskListScreen`: Manages tasks (future implementation).
-    -   `SettingsScreen`: Application settings.
-    -   `SearchScreen`: For searching notes and tasks.
+    -   `HomeScreen`: The main entry point, providing navigation to other sections.
+-   `FolderListScreen`: Displays a list of note folders.
+-   `NoteListScreen`: Shows notes within a selected folder.
+-   `NoteDetailScreen`: For viewing and editing individual notes.
+-   `TaskListScreen`: Manages tasks (future implementation).
+-   `SettingsScreen`: Application settings.
+-   `SearchScreen`: For searching notes and tasks.
 
 -   **Component Development:**
     -   Basic UI elements (buttons, input fields, lists) have been created or planned.
@@ -27,9 +28,10 @@
 
 -   **Navigation Flows:**
     -   **Bottom Tab Navigator:**
-        -   Home (FolderListScreen)
-        -   Search (SearchScreen)
-        -   Settings (SettingsScreen)
+    -   Home (index.tsx)
+    -   Notes (notes.tsx)
+    -   Folders (folders.tsx)
+    -   Explore (explore.tsx)
     -   **Stack Navigator (within Home tab):**
         -   FolderListScreen -> NoteListScreen -> NoteDetailScreen
 
@@ -41,8 +43,9 @@
 
 ## 4. Accomplishments in UI & Navigation
 
--   Successfully laid out static UI elements for all core screens.
--   Implemented the main navigation flows using React Navigation.
+- **Home Screen (`app/index.tsx`)**: Implemented a basic home screen with a welcome message and corrected navigation links to the Notes and Folders sections within the tab structure, including the `/app` prefix for routing.
+-   Successfully laid out static UI elements for core screens including Notes and Folders.
+-   Implemented the main navigation flows using Expo Router's Tabs, including Home, Notes, Folders, and Explore tabs.
 -   Established a foundation for state management with Zustand.
 -   Applied initial styling using NativeWind, though full verification is pending due to the `tailwindConfigV3` error.
 

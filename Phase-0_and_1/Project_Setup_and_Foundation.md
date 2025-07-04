@@ -1,5 +1,3 @@
-# Phase 0 & 1 Documentation: Project Setup and Foundation
-
 ## 1. Project Initialization
 
 -   **Project Name:** Aether
@@ -62,3 +60,12 @@
     -   Creating a new minimal Expo project (`AetherNewMinimal`) to isolate the issue.
 
 Despite these efforts, the `tailwindConfigV3` error persists, and is currently the main focus of debugging.
+
+-   **Metro Error: NoteDetailScreen Resolution and Nested `app` Directory:** A Metro error occurred, stating that `@/screens/NoteDetailScreen` could not be resolved from `app/app/notes/[id].tsx`, indicating a module not found error.
+    -   **Cause:** A redundant nested `app` directory and incorrect import paths due to `expo-router`'s expected path resolution relative to the root `app` directory.
+    -   **Resolution:**
+        -   Identified the redundant `app` directory structure.
+        -   Modified `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\app\notes\[id].tsx` to directly embed the content of the `NoteDetailScreen` component, eliminating the problematic import.
+        -   Deleted the redundant file `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\notes\[noteId].tsx`.
+        -   Removed the entire nested `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\app` directory to streamline the project structure.
+    -   **Outcome:** The Metro error related to `NoteDetailScreen` resolution has been resolved. The project structure is now simplified, and the application runs without errors, with navigation to note details working as expected.

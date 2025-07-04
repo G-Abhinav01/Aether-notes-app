@@ -1,45 +1,20 @@
-# Aether Notes App - Development Status
+# Project Status: Aether Notes App
 
-This document outlines the current progress on the Aether Notes App, focusing on Phase 0 (Pre-Build Foundation) and Phase 1 (UI Scaffold & Navigation).
+## Current State
 
-## Phase 0: Pre-Build Foundation
+- **Project Initialization**: The `AetherNewMinimal` project has been successfully set up as a minimal Expo React Native application.
+- **Dependency Installation**: All initial dependencies have been installed.
+- **Babel Configuration**: The `babel.config.js` file has been created in the `AetherNewMinimal` directory with the Expo preset and NativeWind Babel plugin, resolving the `tailwindConfigV3` error.
+- **Development Server**: The Expo development server (`npm start`) is running, and the Metro Bundler is active. The app is previewable at `http://localhost:8081`.
+- **Core Folder Structure**: The `screens/`, `state/`, and `utils/` directories have been created within `AetherNewMinimal`.
+- Implemented a basic home screen in `app/index.tsx` with a title, description, and corrected navigation links to "Notes" and "Folders" within the tab structure, including the `/app` prefix for routing.
 
-**Goal:** Set up project structure, core screens, navigation, styling base, dark/light theme toggle, and initial GitHub repo.
+## Next Steps
 
-### Accomplishments:
-
-- **Project Setup:** A new React Native project named `Aether` has been created using Expo, and the minimal setup is complete and previewable.
-- **Navigation:** React Navigation (Stack and Bottom Tab Navigators) has been integrated.
-- **Styling:** NativeWind (Tailwind CSS for React Native) has been integrated, but is currently experiencing a persistent `tailwindConfigV3` error.
-- **State Management:** Zustand has been set up in the `state/` folder (initial shell store).
-- **Core Folders:** `screens/`, `components/`, `state/`, `assets/`, and `utils/` folders have been created.
-- **Theming:** Basic dark theme has been implemented as default, with a toggle in `SettingsScreen` (though full functionality needs verification).
-- **Screen Scaffolding:** Initial screens (`FolderListScreen`, `NoteListScreen`, `NoteDetailScreen`, `TaskListScreen`, `SettingsScreen`, `SearchScreen`) have been scaffolded.
-
-### Pending/To Be Verified:
-
-- Full functionality of the dark/light theme toggle.
-- Resolution of the `tailwindConfigV3` error with NativeWind.
-- Verification of screen navigation and transitions.
-- Confirmation of the complete folder structure as per requirements.
-
-## Phase 1: UI Scaffold & Navigation
-
-**Goal:** Lay out all static UI screens: folder list, nested folder view, notes/tasks toggles, detail view, and settings.
-
-### Accomplishments:
-
-- **UI Layout:** Static UI elements for `FolderListScreen`, `NoteListScreen`, `NoteDetailScreen`, `TaskListScreen`, `SettingsScreen`, and `SearchScreen` have been laid out.
-- **Navigation Flow:** Bottom Tab Navigator for Home (FolderList), Search, and Settings, and Stack Navigation for Folder → NoteList → NoteDetail have been implemented.
-- **Styling Application:** Tailwind/NativeWind classes have been applied for initial styling, but their full effect is hindered by the `tailwindConfigV3` error.
-
-### Pending/To Be Verified:
-
-- Confirmation of all UI elements matching the design specifications.
-- Ensuring consistent padding, font hierarchy, soft rounded corners, and dark-muted backgrounds across all screens.
-- Verification that the layout feels responsive and smooth.
-- Integration of placeholder images/icons in `assets/`.
-
-## Overall Status:
-
-The foundational setup and initial UI scaffolding are largely complete. However, the persistent `tailwindConfigV3` error with NativeWind is currently preventing full styling and verification of the UI. Once this is addressed, further refinement and implementation of logic (Phase 2) can proceed.
+1.  **State Management**: Implement state management for notes (e.g., using Context API or Redux).
+2.  **Theme and Styling**: Define a consistent theme and styling system for the application.
+3.  **Screen Scaffolding**: Further develop the UI for `NotesScreen`, `NoteDetailScreen`, and `FolderListScreen`.
+4.  **Data Persistence**: Implement local data persistence for notes (e.g., using `expo-sqlite` or `AsyncStorage`).
+5.  **Folder Management**: Implement functionality for creating, editing, and deleting folders.
+6.  **Search and Filter**: Add search and filter capabilities for notes.
+7.  **User Interface Enhancements**: Improve the overall look and feel of the application.

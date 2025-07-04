@@ -1,5 +1,3 @@
-# Current Issues in Aether Notes App
-
 This document outlines the ongoing issues encountered during the development of the Aether Notes App, primarily focusing on the persistent blank white screen on the web platform.
 
 ## 1. Persistent Blank White Screen on Web
@@ -28,3 +26,23 @@ This document outlines the ongoing issues encountered during the development of 
     - Clearing npm cache.
     - Creating `postcss.config.js`.
 - A new minimal Expo project (`AetherNewMinimal`) has been created to isolate and troubleshoot the NativeWind issue.
+
+## 2. Metro Error: NoteDetailScreen Resolution and Nested `app` Directory
+
+**Issue:** A Metro error occurred, stating that `@/screens/NoteDetailScreen` could not be resolved from `app/app/notes/[id].tsx`, indicating a module not found error.
+
+**Why it arose:**
+- The error was caused by a redundant nested `app` directory at `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\app`.
+- This nested structure led to incorrect import paths, as `expo-router` expects paths relative to the root `app` directory.
+- The `NoteDetailScreen` component was being imported from `@/screens/NoteDetailScreen`, but the file was moved to `app/notes/[noteId].tsx` and then to `app/app/notes/[id].tsx`, causing a mismatch in the expected module resolution.
+
+**How we're dealing with it:**
+- Identified the redundant `app` directory structure using `list_dir`.
+- Modified `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\app\notes\[id].tsx` to directly embed the content of the `NoteDetailScreen` component, eliminating the need for the problematic import.
+- Deleted the redundant file `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\notes\[noteId].tsx`.
+- Removed the entire nested `e:\Projects\Aether\Aether-notes-app\AetherNewMinimal\app\app` directory using `Remove-Item -Recurse -Force` to streamline the project structure.
+
+**Current State:**
+- The Metro error related to `NoteDetailScreen` resolution has been resolved.
+- The project structure is now simplified, with a single `app` directory at the root of `AetherNewMinimal`.
+- The application runs without errors, and navigation to note details works as expected.
