@@ -6,10 +6,20 @@ import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useTheme } from '@/context/ThemeContext';
+
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  return (
+    <ThemeProvider>
+      <RootLayoutContent />
+    </ThemeProvider>
+  );
+}
+
+function RootLayoutContent() {
+  const { colorScheme } = useTheme();
 
   return (
     <Tabs
@@ -59,6 +69,15 @@ export default function TabLayout() {
             title: 'Folders',
             tabBarIcon: ({ color, focused }) => (
               <IconSymbol size={28} name={focused ? 'folder' : 'folder-outline'} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: 'Settings',
+            tabBarIcon: ({ color, focused }) => (
+              <IconSymbol size={28} name={focused ? 'settings' : 'settings-outline'} color={color} />
             ),
           }}
         />

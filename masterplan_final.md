@@ -75,7 +75,7 @@ This guide outlines the key phases for building the Aether MVP, providing a high
 **Goal:** Refine the user experience with animations, improved UI elements, and search functionality.
 
 **Key Activities:**
-*   Implementing dark/light theme toggling.
+*   Implemented dark/light theme toggling.
 *   Enhancing the user interface with subtle animations and improved component designs.
 *   Developing robust search capabilities for notes and folders.
 

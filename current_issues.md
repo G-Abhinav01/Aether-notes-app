@@ -46,3 +46,33 @@ This document outlines the ongoing issues encountered during the development of 
 - The Metro error related to `NoteDetailScreen` resolution has been resolved.
 - The project structure is now simplified, with a single `app` directory at the root of `AetherNewMinimal`.
 - The application runs without errors, and navigation to note details works as expected.
+
+## 3. Theme-Related Errors and Global Dark Mode Application
+
+**Issue:** Multiple issues related to theme application and the `useTheme` hook were encountered.
+- Initially, `_Appearance.default.setColorScheme is not a function` error prevented theme persistence.
+- Subsequently, `Uncaught Error: useTheme is not defined` occurred in `hooks/useThemeColor.ts` and `components/ThemedView.tsx`.
+- Dark mode was only applied to the settings screen, not globally.
+- A `SyntaxError: Identifier 'StyleSheet' has already been declared` appeared in `app/index.tsx`.
+- Finally, `Uncaught Error: useTheme must be used within a ThemeProvider` was reported.
+
+**Why it arose:**
+- The `_Appearance.default.setColorScheme` error was due to attempting to call `Appearance.setColorScheme` on web platforms where it's not supported.
+- The `useTheme is not defined` error was caused by incorrect import paths for the `useTheme` hook in `useThemeColor.ts`.
+- Dark mode not being global was due to `app/index.tsx` and other tab screens (`notes.tsx`, `explore.tsx`, `folders.tsx`) using hardcoded styles and native `View`/`Text` components instead of `ThemedView`/`ThemedText`.
+- The `StyleSheet` syntax error was caused by a duplicate import of `StyleSheet` in `app/index.tsx`.
+- The `useTheme must be used within a ThemeProvider` error occurred because the `ThemeProvider` was not wrapping the entire application's `Stack` component in `app/_layout.tsx`.
+
+**How we're dealing with it:**
+- Modified `ThemeContext.tsx` to conditionally call `Appearance.setColorScheme` only for non-web platforms and explicitly set the initial color scheme for web to 'dark'.
+- Modified `useThemeColor.ts` to correctly import `useTheme` from `ThemeContext.tsx` and removed the redundant `useColorScheme` import.
+- Modified `app/index.tsx`, `app/(tabs)/notes.tsx`, `app/(tabs)/explore.tsx`, and `app/(tabs)/folders.tsx` to replace native `View`/`Text` components with `ThemedView`/`ThemedText` and removed hardcoded color styles.
+- Removed the duplicate `StyleSheet` import in `app/index.tsx`.
+- Wrapped the `Stack` component with `ThemeProvider` in `app/_layout.tsx`.
+
+**Current State:**
+- All theme-related errors have been resolved.
+- Dark mode is now applied globally across the application.
+- The theme toggle functions correctly.
+- The `StyleSheet` syntax error is resolved.
+- The `useTheme` hook is correctly accessible throughout the application.

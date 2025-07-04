@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
 export default function NotesScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Notes Screen</Text>
-      <Text>This is where your notes will be displayed.</Text>
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">Notes Screen</ThemedText>
+      <ThemedText>This is where your notes will be displayed.</ThemedText>
+    </ThemedView>
   );
 }
 
@@ -14,9 +16,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
   },
 });

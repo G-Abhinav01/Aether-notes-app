@@ -1,14 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { Link } from "expo-router";
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Aether Notes!</Text>
-      <Text style={styles.subtitle}>Your personal space for thoughts and ideas.</Text>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">Welcome to Aether Notes!</ThemedText>
+      <ThemedText type="subtitle">Your personal space for thoughts and ideas.</ThemedText>
       <Link href="/(tabs)/notes" style={styles.link}>Go to Notes</Link>
       <Link href="/(tabs)/folders" style={styles.link}>View Folders</Link>
-    </View>
+    </ThemedView>
   );
 }
 
@@ -17,22 +19,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 20,
   },
   link: {
     fontSize: 18,
-    color: "#007AFF",
     marginTop: 10,
   },
 });

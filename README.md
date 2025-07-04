@@ -158,3 +158,48 @@ All rights reserved.
 Commercial or derivative use of the code, design, or concepts is **strictly prohibited** without prior written permission from the author.
 
 © 2025 G Abhinav (@Abhinav)
+
+---
+
+# 🚀 Migration Notice (v1.1 → v2.0)
+
+## 🛠️ Migration from React Native to Flutter + Dart
+
+As of version 2.0, this project has been migrated from React Native to Flutter + Dart.
+
+This decision was made after careful consideration of the project's long-term maintainability, performance goals, and development roadmap.
+
+## 🔄 Why the Migration?
+
+Several factors contributed to this shift:
+
+-   **Unified Tooling & Ecosystem:** Flutter provides a cohesive environment with first-party tooling (e.g., Flutter CLI, Hot Reload, Dart DevTools), making development more streamlined and consistent.
+
+-   **Performance:** Flutter compiles directly to native ARM code, offering smoother animations and lower latency compared to React Native’s JavaScript bridge architecture.
+
+-   **UI Consistency:** Flutter’s widget-based rendering ensures pixel-perfect UI across both iOS and Android without relying heavily on native components.
+
+-   **Reduced Dependency Overhead:** React Native often depends on third-party libraries for essential functionality, leading to frequent version mismatches and compatibility issues.
+
+-   **Long-Term Maintainability:** Flutter’s active community, robust documentation, and growing adoption across platforms (mobile, web, desktop) offer a more unified and future-proof approach.
+
+
+## 📁 Project Versioning
+
+v1.1 and earlier: Built with React Native (JavaScript/TypeScript)
+
+v2.0 and beyond: Built with Flutter (Dart)
+
+
+Older versions are preserved in the repository under the `legacy/react-native` branch for reference and archival purposes.
+
+
+---
+
+## 💡 Notes for Developers
+
+The new Flutter codebase is structured following best practices including separation of concerns, state management (e.g., Provider, Riverpod, or Bloc depending on your choice), and platform-agnostic UI.
+
+Documentation and contribution guidelines have been updated to reflect Flutter usage.
+
+All core functionality from the React Native version has been re-evaluated and reimplemented to align with Flutter conventions.
