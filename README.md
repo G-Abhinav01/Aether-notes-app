@@ -119,6 +119,7 @@ Current status: UI Scaffolding → State Logic Integration → Firebase Sync
 - ❌ No reuse, redistribution, or commercial use allowed  
 - 📩 Contact author for permission: [@Abhinav on GitHub](https://github.com/G-Abhinav01)
 
+# Unauthorized use, copying, distribution, or modification of this code is prohibited
 ---
 
 ## 🔗 Live Preview
