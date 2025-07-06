@@ -48,6 +48,8 @@ web_modules/
 *.tsbuildinfo
 
 # Optional npm cache directory
+
+masterplan_final.md
 .npm
 
 # Local files
