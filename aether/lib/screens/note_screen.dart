@@ -474,7 +474,7 @@ class _NoteScreenState extends State<NoteScreen> {
               padding: const EdgeInsets.all(16),
               color: Theme.of(
                 context,
-              ).colorScheme.surfaceVariant.withOpacity(0.3),
+              ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

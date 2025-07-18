@@ -123,7 +123,7 @@ class ContentRepository {
 
       // Extract basic image metadata
       final imageBytes = await imageFile.readAsBytes();
-      final image = await ui.decodeImageFromList(imageBytes);
+      final image = ui.decodeImageFromList(imageBytes);
 
       final imageMetadata = ImageMetadata(
         width: image.width,

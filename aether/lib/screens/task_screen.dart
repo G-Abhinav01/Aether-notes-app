@@ -605,7 +605,7 @@ class _TaskScreenState extends State<TaskScreen> {
               padding: const EdgeInsets.all(16),
               color: Theme.of(
                 context,
-              ).colorScheme.surfaceVariant.withOpacity(0.3),
+              ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
