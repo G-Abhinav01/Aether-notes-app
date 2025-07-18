@@ -146,5 +146,5 @@ vite.config.ts.timestamp-*
 # Expo
 .expo/
 
-# Kiro local files (detailed project status)
-.kiro/current_status_local.md
+# Kiro files (project specs and local status)
+.kiro/

@@ -9,49 +9,40 @@ part 'task.g.dart';
 class Task extends ContentItem {
   /// Description of the task
   String description;
-  
+
   /// Whether the task is completed
   bool isCompleted;
-  
+
   /// Due date for the task (optional)
   DateTime? dueDate;
-  
+
   /// Priority level of the task
   TaskPriority priority;
-  
+
   /// Tags associated with the task
   List<String> tags;
-  
+
   Task({
-    String? id,
-    required String name,
-    String? parentFolderId,
-    DateTime? createdAt,
-    DateTime? modifiedAt,
-    bool isFavorite = false,
-    bool isDeleted = false,
+    super.id,
+    required super.name,
+    super.parentFolderId,
+    super.createdAt,
+    super.modifiedAt,
+    super.isFavorite,
+    super.isDeleted,
     this.description = '',
     this.isCompleted = false,
     this.dueDate,
     this.priority = TaskPriority.medium,
     this.tags = const [],
-  }) : super(
-    id: id,
-    name: name,
-    parentFolderId: parentFolderId,
-    createdAt: createdAt,
-    modifiedAt: modifiedAt,
-    isFavorite: isFavorite,
-    isDeleted: isDeleted,
-    type: ContentType.task,
-  );
-  
+  }) : super(type: ContentType.task);
+
   /// Create from JSON
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
-  
+
   @override
   Map<String, dynamic> toJson() => _$TaskToJson(this);
-  
+
   @override
   Task copyWith({
     String? name,
@@ -66,10 +57,10 @@ class Task extends ContentItem {
     List<String>? tags,
   }) {
     return Task(
-      id: this.id,
+      id: id,
       name: name ?? this.name,
       parentFolderId: parentFolderId ?? this.parentFolderId,
-      createdAt: this.createdAt,
+      createdAt: createdAt,
       modifiedAt: modifiedAt ?? DateTime.now(),
       isFavorite: isFavorite ?? this.isFavorite,
       isDeleted: isDeleted ?? this.isDeleted,
@@ -80,24 +71,19 @@ class Task extends ContentItem {
       tags: tags ?? List.from(this.tags),
     );
   }
-  
-  @override
-  bool validate() {
-    return super.validate();
-  }
-  
+
   /// Toggle completion status
   void toggleCompletion() {
     isCompleted = !isCompleted;
     modifiedAt = DateTime.now();
   }
-  
+
   /// Check if task is overdue
   bool isOverdue() {
     if (dueDate == null || isCompleted) return false;
     return dueDate!.isBefore(DateTime.now());
   }
-  
+
   /// Add a tag to the task
   void addTag(String tag) {
     if (!tags.contains(tag)) {
@@ -105,7 +91,7 @@ class Task extends ContentItem {
       modifiedAt = DateTime.now();
     }
   }
-  
+
   /// Remove a tag from the task
   void removeTag(String tag) {
     if (tags.remove(tag)) {

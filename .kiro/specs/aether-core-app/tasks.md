@@ -74,7 +74,8 @@
 
 
 
-- [ ] 5. Implement theme service and app settings
+- [x] 5. Implement theme service and app settings
+
   - Create ThemeService class for managing light/dark themes
   - Implement settings persistence using SharedPreferences
   - Add theme switching logic with system theme detection
@@ -82,12 +83,16 @@
   - Write tests for theme switching functionality
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
+
+
 - [ ] 6. Build navigation service and routing
   - Implement NavigationService for folder hierarchy management
   - Set up GoRouter configuration for app routing
   - Create navigation methods for folder traversal and breadcrumbs
   - Add deep linking support for content items
   - Test navigation flows and route parameter handling
+
+
   - _Requirements: 1.1, 1.4, 1.5_
 
 - [ ] 7. Create main app structure and bottom navigation
@@ -110,6 +115,7 @@
   - Create FolderScreen widget for displaying folder contents
   - Implement folder navigation with proper state management
   - Add breadcrumb navigation component for current path display
+
   - Create back navigation functionality with proper state handling
   - Test nested folder navigation and state persistence
   - _Requirements: 1.3, 1.4, 1.5_
@@ -117,12 +123,17 @@
 - [ ] 10. Build content creation dialogs and forms
   - Create content type selection dialog (folder, note, task, image)
   - Implement folder creation form with validation
+
+
   - Build note creation form with basic text input
   - Create task creation form with title, description, and status fields
   - Add image picker integration for image content
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 11. Implement note editor with rich text support
+- [x] 11. Implement note editor with rich text support
+
+
+
   - Create NoteEditorScreen with rich text editing capabilities
   - Add basic formatting options (bold, italic, lists)
   - Implement auto-save functionality for note content

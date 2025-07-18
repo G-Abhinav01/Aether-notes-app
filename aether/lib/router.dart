@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:aether/models/models.dart';
 import 'package:aether/repositories/content_repository.dart';
 import 'package:aether/services/navigation_service.dart';
 
@@ -20,25 +19,21 @@ import 'package:aether/screens/not_found_screen.dart';
 class AppRouter {
   final ContentRepository _contentRepository;
   final NavigationService _navigationService;
-  
+
   AppRouter({
     required ContentRepository contentRepository,
     required NavigationService navigationService,
-  }) : 
-    _contentRepository = contentRepository,
-    _navigationService = navigationService;
-  
+  }) : _contentRepository = contentRepository,
+       _navigationService = navigationService;
+
   /// Create the router
   GoRouter get router => GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
     routes: [
       // Home route (root folder)
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      
+      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+
       // Folder route
       GoRoute(
         path: '/folder/:id',
@@ -47,7 +42,7 @@ class AppRouter {
           return FolderScreen(folderId: folderId);
         },
       ),
-      
+
       // Note route
       GoRoute(
         path: '/note/:id',
@@ -56,7 +51,7 @@ class AppRouter {
           return NoteScreen(noteId: noteId);
         },
       ),
-      
+
       // Task route
       GoRoute(
         path: '/task/:id',
@@ -65,7 +60,7 @@ class AppRouter {
           return TaskScreen(taskId: taskId);
         },
       ),
-      
+
       // Image route
       GoRoute(
         path: '/image/:id',
@@ -74,25 +69,22 @@ class AppRouter {
           return ImageScreen(imageId: imageId);
         },
       ),
-      
+
       // Recent notes route
       GoRoute(
         path: '/recent-notes',
         builder: (context, state) => const RecentNotesScreen(),
       ),
-      
+
       // Recent tasks route
       GoRoute(
         path: '/recent-tasks',
         builder: (context, state) => const RecentTasksScreen(),
       ),
-      
+
       // Trash route
-      GoRoute(
-        path: '/trash',
-        builder: (context, state) => const TrashScreen(),
-      ),
-      
+      GoRoute(path: '/trash', builder: (context, state) => const TrashScreen()),
+
       // Settings route
       GoRoute(
         path: '/settings',
@@ -102,7 +94,7 @@ class AppRouter {
     errorBuilder: (context, state) => const NotFoundScreen(),
     redirect: _handleRedirect,
   );
-  
+
   /// Handle redirects
   String? _handleRedirect(BuildContext context, GoRouterState state) {
     // Handle any redirects here
