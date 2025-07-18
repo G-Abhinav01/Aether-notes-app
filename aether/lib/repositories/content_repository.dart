@@ -498,4 +498,179 @@ class ContentRepository {
     final exportFile = await _fileService.exportContent(content, fileName);
     return exportFile.path;
   }
+
+  /// Get storage statistics
+  Future<Map<String, int>> getStorageStats() async {
+    try {
+      final allItems = await _storageService.getAllContentItems();
+      final stats = <String, int>{
+        'folders': 0,
+        'notes': 0,
+        'tasks': 0,
+        'images': 0,
+        'trash': 0,
+      };
+
+      for (final item in allItems) {
+        if (item.isDeleted) {
+          stats['trash'] = (stats['trash'] ?? 0) + 1;
+        } else {
+          switch (item.type) {
+            case ContentType.folder:
+              stats['folders'] = (stats['folders'] ?? 0) + 1;
+              break;
+            case ContentType.note:
+              stats['notes'] = (stats['notes'] ?? 0) + 1;
+              break;
+            case ContentType.task:
+              stats['tasks'] = (stats['tasks'] ?? 0) + 1;
+              break;
+            case ContentType.image:
+              stats['images'] = (stats['images'] ?? 0) + 1;
+              break;
+          }
+        }
+      }
+
+      return stats;
+    } catch (e) {
+      throw Exception('Failed to get storage stats: $e');
+    }
+  }
+
+  /// Export all data to files
+  Future<String> exportAllData() async {
+    try {
+      final exportDir = await _fileService.getExportDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final exportPath = '${exportDir.path}/aether_export_$timestamp';
+
+      final exportDirectory = Directory(exportPath);
+      await exportDirectory.create(recursive: true);
+
+      // Get all non-deleted items
+      final allItems = await _storageService.getAllContentItems();
+      final activeItems = allItems.where((item) => !item.isDeleted).toList();
+
+      // Export notes
+      final notes = activeItems.whereType<Note>().toList();
+      if (notes.isNotEmpty) {
+        final notesDir = Directory('$exportPath/notes');
+        await notesDir.create();
+
+        for (final note in notes) {
+          final fileName =
+              '${note.name.replaceAll(RegExp(r'[^\w\s-]'), '_')}.md';
+          final file = File('${notesDir.path}/$fileName');
+          await file.writeAsString('# ${note.name}\n\n${note.content}');
+        }
+      }
+
+      // Export tasks
+      final tasks = activeItems.whereType<Task>().toList();
+      if (tasks.isNotEmpty) {
+        final tasksDir = Directory('$exportPath/tasks');
+        await tasksDir.create();
+
+        for (final task in tasks) {
+          final fileName =
+              '${task.name.replaceAll(RegExp(r'[^\w\s-]'), '_')}.md';
+          final file = File('${tasksDir.path}/$fileName');
+          final content = StringBuffer();
+          content.writeln('# ${task.name}');
+          content.writeln();
+          content.writeln(
+            '**Status:** ${task.isCompleted ? 'Completed' : 'Pending'}',
+          );
+          content.writeln('**Priority:** ${task.priority.name}');
+          if (task.dueDate != null) {
+            content.writeln('**Due Date:** ${task.dueDate}');
+          }
+          if (task.description.isNotEmpty) {
+            content.writeln();
+            content.writeln('## Description');
+            content.writeln(task.description);
+          }
+          await file.writeAsString(content.toString());
+        }
+      }
+
+      // Export images
+      final images = activeItems.whereType<ImageItem>().toList();
+      if (images.isNotEmpty) {
+        final imagesDir = Directory('$exportPath/images');
+        await imagesDir.create();
+
+        for (final image in images) {
+          final sourceFile = File(image.filePath);
+          if (await sourceFile.exists()) {
+            final fileName =
+                '${image.name.isNotEmpty ? image.name : 'image_${image.id}'}.${image.filePath.split('.').last}';
+            final targetFile = File('${imagesDir.path}/$fileName');
+            await sourceFile.copy(targetFile.path);
+          }
+        }
+      }
+
+      return exportPath;
+    } catch (e) {
+      throw Exception('Failed to export data: $e');
+    }
+  }
+
+  /// Empty trash (permanently delete all trashed items)
+  Future<void> emptyTrash() async {
+    try {
+      final trashedItems = await _storageService.getTrashedItems();
+
+      for (final item in trashedItems) {
+        // Delete associated files for images
+        if (item is ImageItem) {
+          final file = File(item.filePath);
+          if (await file.exists()) {
+            await file.delete();
+          }
+
+          // Delete thumbnail if exists
+          final thumbnailFile = File(item.thumbnailPath);
+          if (await thumbnailFile.exists()) {
+            await thumbnailFile.delete();
+          }
+        }
+
+        // Permanently delete from database
+        await _storageService.deleteContentItem(item.id);
+      }
+    } catch (e) {
+      throw Exception('Failed to empty trash: $e');
+    }
+  }
+
+  /// Clear all data (for settings screen)
+  Future<void> clearAllData() async {
+    try {
+      // Get all items (including deleted ones)
+      final allItems = await _storageService.getAllContentItems();
+
+      // Delete all image files
+      for (final item in allItems) {
+        if (item is ImageItem) {
+          final file = File(item.filePath);
+          if (await file.exists()) {
+            await file.delete();
+          }
+
+          final thumbnailFile = File(item.thumbnailPath);
+          if (await thumbnailFile.exists()) {
+            await thumbnailFile.delete();
+          }
+        }
+      }
+
+      // Clear all data from database
+      await _storageService.clearAllData();
+    } catch (e) {
+      throw Exception('Failed to clear all data: $e');
+    }
+  }
 }

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:aether/services/theme_service.dart';
 import 'package:aether/services/settings_service.dart';
-import 'package:aether/services/file_service.dart';
-import 'package:aether/models/enums.dart';
+import 'package:aether/repositories/content_repository.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,128 +12,314 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _totalStorageSize = 0;
-  bool _isLoadingStorageSize = true;
-  
+  bool _isLoading = false;
+  Map<String, int> _storageStats = {};
+
   @override
   void initState() {
     super.initState();
-    _loadStorageSize();
+    _loadStorageStats();
   }
-  
-  Future<void> _loadStorageSize() async {
-    final fileService = FileService();
-    final size = await fileService.getTotalStorageSize();
-    
-    setState(() {
-      _totalStorageSize = size;
-      _isLoadingStorageSize = false;
-    });
+
+  Future<void> _loadStorageStats() async {
+    try {
+      final contentRepository = Provider.of<ContentRepository>(
+        context,
+        listen: false,
+      );
+      final stats = await contentRepository.getStorageStats();
+      if (mounted) {
+        setState(() {
+          _storageStats = stats;
+        });
+      }
+    } catch (e) {
+      // Handle error silently for now
+    }
   }
-  
-  @override
-  Widget build(BuildContext context) {
-    final themeService = Provider.of<ThemeService>(context);
-    final settingsService = Provider.of<SettingsService>(context);
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
-      body: ListView(
-        children: [
-          // Theme settings
-          ListTile(
-            title: const Text('Theme'),
-            subtitle: const Text('Choose app theme'),
-            leading: const Icon(Icons.brightness_6),
-            onTap: () => _showThemeDialog(context, themeService),
+
+  Future<void> _clearAllData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear All Data'),
+        content: const Text(
+          'This will permanently delete all your notes, tasks, images, and folders. '
+          'This action cannot be undone. Are you sure you want to continue?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
           ),
-          
-          // View mode settings
-          ListTile(
-            title: const Text('View Mode'),
-            subtitle: Text(
-              settingsService.getViewMode() == ViewMode.list
-                  ? 'List View'
-                  : 'Grid View',
-            ),
-            leading: const Icon(Icons.view_list),
-            onTap: () => _showViewModeDialog(context, settingsService),
-          ),
-          
-          // Sort options
-          ListTile(
-            title: const Text('Default Sort'),
-            subtitle: Text(_getSortOptionText(settingsService.getSortOption())),
-            leading: const Icon(Icons.sort),
-            onTap: () => _showSortOptionDialog(context, settingsService),
-          ),
-          
-          const Divider(),
-          
-          // Storage info
-          ListTile(
-            title: const Text('Storage Usage'),
-            subtitle: _isLoadingStorageSize
-                ? const Text('Calculating...')
-                : Text(_formatFileSize(_totalStorageSize)),
-            leading: const Icon(Icons.storage),
-            trailing: IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: _loadStorageSize,
-            ),
-          ),
-          
-          // Trash settings
-          ListTile(
-            title: const Text('Trash Retention'),
-            subtitle: Text('${settingsService.getTrashRetentionDays()} days'),
-            leading: const Icon(Icons.delete),
-            onTap: () => _showTrashRetentionDialog(context, settingsService),
-          ),
-          
-          const Divider(),
-          
-          // Backup settings
-          ListTile(
-            title: const Text('Auto Backup'),
-            subtitle: Text(
-              settingsService.getAutoBackup()
-                  ? 'Enabled (Every ${settingsService.getBackupFrequency()} days)'
-                  : 'Disabled',
-            ),
-            leading: const Icon(Icons.backup),
-            onTap: () => _showBackupSettingsDialog(context, settingsService),
-          ),
-          
-          // Manual backup
-          ListTile(
-            title: const Text('Create Backup Now'),
-            leading: const Icon(Icons.save),
-            onTap: () {
-              // TODO: Implement manual backup
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Backup created')),
-              );
-            },
-          ),
-          
-          const Divider(),
-          
-          // About section
-          ListTile(
-            title: const Text('About Aether'),
-            subtitle: const Text('Version 1.0.0'),
-            leading: const Icon(Icons.info),
-            onTap: () => _showAboutDialog(context),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Clear All Data'),
           ),
         ],
       ),
     );
+
+    if (confirmed == true && mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final contentRepository = Provider.of<ContentRepository>(
+          context,
+          listen: false,
+        );
+        await contentRepository.clearAllData();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('All data has been cleared')),
+          );
+          _loadStorageStats(); // Refresh stats
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error clearing data: $e')));
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
   }
-  
-  void _showThemeDialog(BuildContext context, ThemeService themeService) {
+
+  Future<void> _emptyTrash() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Empty Trash'),
+        content: const Text(
+          'This will permanently delete all items in the trash. '
+          'This action cannot be undone. Are you sure?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Empty Trash'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        final contentRepository = Provider.of<ContentRepository>(
+          context,
+          listen: false,
+        );
+        await contentRepository.emptyTrash();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Trash has been emptied')),
+          );
+          _loadStorageStats(); // Refresh stats
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error emptying trash: $e')));
+        }
+      }
+    }
+  }
+
+  String _formatCount(int count) {
+    if (count == 0) return '0';
+    if (count < 1000) return count.toString();
+    if (count < 1000000) return '${(count / 1000).toStringAsFixed(1)}K';
+    return '${(count / 1000000).toStringAsFixed(1)}M';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Settings')),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              children: [
+                // Appearance Section
+                _buildSectionHeader('Appearance'),
+                Consumer<ThemeService>(
+                  builder: (context, themeService, child) {
+                    return ListTile(
+                      leading: const Icon(Icons.palette),
+                      title: const Text('Theme'),
+                      subtitle: Text(_getThemeModeText(themeService.themeMode)),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => _showThemeDialog(themeService),
+                    );
+                  },
+                ),
+
+                Consumer<SettingsService>(
+                  builder: (context, settingsService, child) {
+                    return SwitchListTile(
+                      secondary: const Icon(Icons.view_module),
+                      title: const Text('Default Grid View'),
+                      subtitle: const Text(
+                        'Use grid view by default for folders',
+                      ),
+                      value: settingsService.defaultGridView,
+                      onChanged: (value) {
+                        settingsService.setDefaultGridView(value);
+                      },
+                    );
+                  },
+                ),
+
+                // Storage Section
+                _buildSectionHeader('Storage'),
+                ListTile(
+                  leading: const Icon(Icons.folder),
+                  title: const Text('Folders'),
+                  trailing: Text(_formatCount(_storageStats['folders'] ?? 0)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.note),
+                  title: const Text('Notes'),
+                  trailing: Text(_formatCount(_storageStats['notes'] ?? 0)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.task),
+                  title: const Text('Tasks'),
+                  trailing: Text(_formatCount(_storageStats['tasks'] ?? 0)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.image),
+                  title: const Text('Images'),
+                  trailing: Text(_formatCount(_storageStats['images'] ?? 0)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('Trash Items'),
+                  trailing: Text(_formatCount(_storageStats['trash'] ?? 0)),
+                ),
+
+                // Data Management Section
+                _buildSectionHeader('Data Management'),
+                ListTile(
+                  leading: const Icon(Icons.delete_sweep),
+                  title: const Text('Empty Trash'),
+                  subtitle: const Text('Permanently delete all trashed items'),
+                  onTap:
+                      _storageStats['trash'] != null &&
+                          _storageStats['trash']! > 0
+                      ? _emptyTrash
+                      : null,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.refresh),
+                  title: const Text('Refresh Storage Stats'),
+                  subtitle: const Text('Update storage information'),
+                  onTap: _loadStorageStats,
+                ),
+
+                // Backup Section
+                _buildSectionHeader('Backup & Export'),
+                ListTile(
+                  leading: const Icon(Icons.backup),
+                  title: const Text('Export All Data'),
+                  subtitle: const Text('Export all content to files'),
+                  onTap: _exportAllData,
+                ),
+
+                // Danger Zone
+                _buildSectionHeader('Danger Zone'),
+                ListTile(
+                  leading: const Icon(Icons.warning, color: Colors.red),
+                  title: const Text(
+                    'Clear All Data',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  subtitle: const Text('Permanently delete all app data'),
+                  onTap: _clearAllData,
+                ),
+
+                // About Section
+                _buildSectionHeader('About'),
+                const ListTile(
+                  leading: Icon(Icons.info),
+                  title: Text('Version'),
+                  trailing: Text('1.0.0'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.code),
+                  title: const Text('Open Source'),
+                  subtitle: const Text('Built with Flutter'),
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: 'Aether',
+                      applicationVersion: '1.0.0',
+                      applicationIcon: const Icon(Icons.note_alt, size: 48),
+                      children: [
+                        const Text(
+                          'A modern note-taking and task management app built with Flutter.',
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Features:'),
+                        const Text('• Hierarchical folder organization'),
+                        const Text('• Rich text notes with formatting'),
+                        const Text('• Task management with priorities'),
+                        const Text('• Image storage and viewing'),
+                        const Text('• Full-text search capabilities'),
+                        const Text('• Dark and light theme support'),
+                      ],
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 32),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  String _getThemeModeText(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'Light';
+      case ThemeMode.dark:
+        return 'Dark';
+      case ThemeMode.system:
+        return 'System';
+    }
+  }
+
+  void _showThemeDialog(ThemeService themeService) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -142,272 +327,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
+            RadioListTile<ThemeMode>(
               title: const Text('Light'),
-              leading: const Icon(Icons.brightness_5),
-              onTap: () {
-                themeService.setThemeMode(ThemeMode.light);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Dark'),
-              leading: const Icon(Icons.brightness_3),
-              onTap: () {
-                themeService.setThemeMode(ThemeMode.dark);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('System'),
-              leading: const Icon(Icons.brightness_auto),
-              onTap: () {
-                themeService.setThemeMode(ThemeMode.system);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showViewModeDialog(BuildContext context, SettingsService settingsService) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Choose View Mode'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('List View'),
-              leading: const Icon(Icons.view_list),
-              onTap: () async {
-                await settingsService.setViewMode(ViewMode.list);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-            ListTile(
-              title: const Text('Grid View'),
-              leading: const Icon(Icons.grid_view),
-              onTap: () async {
-                await settingsService.setViewMode(ViewMode.grid);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showSortOptionDialog(BuildContext context, SettingsService settingsService) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Choose Sort Option'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('Name (A-Z)'),
-              onTap: () async {
-                await settingsService.setSortOption(SortOption.nameAsc);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-            ListTile(
-              title: const Text('Name (Z-A)'),
-              onTap: () async {
-                await settingsService.setSortOption(SortOption.nameDesc);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-            ListTile(
-              title: const Text('Date Created (Newest First)'),
-              onTap: () async {
-                await settingsService.setSortOption(SortOption.dateCreatedDesc);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-            ListTile(
-              title: const Text('Date Created (Oldest First)'),
-              onTap: () async {
-                await settingsService.setSortOption(SortOption.dateCreatedAsc);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-            ListTile(
-              title: const Text('Date Modified (Newest First)'),
-              onTap: () async {
-                await settingsService.setSortOption(SortOption.dateModifiedDesc);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-            ListTile(
-              title: const Text('Date Modified (Oldest First)'),
-              onTap: () async {
-                await settingsService.setSortOption(SortOption.dateModifiedAsc);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showTrashRetentionDialog(BuildContext context, SettingsService settingsService) {
-    final options = [7, 14, 30, 60, 90];
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Trash Retention Period'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: options.map((days) {
-            return ListTile(
-              title: Text('$days days'),
-              onTap: () async {
-                await settingsService.setTrashRetentionDays(days);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-  
-  void _showBackupSettingsDialog(BuildContext context, SettingsService settingsService) {
-    final currentAutoBackup = settingsService.getAutoBackup();
-    final currentFrequency = settingsService.getBackupFrequency();
-    
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text('Backup Settings'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SwitchListTile(
-                  title: const Text('Auto Backup'),
-                  value: currentAutoBackup,
-                  onChanged: (value) {
-                    setState(() {
-                      settingsService.setAutoBackup(value);
-                    });
-                  },
-                ),
-                if (currentAutoBackup)
-                  ListTile(
-                    title: const Text('Backup Frequency'),
-                    subtitle: Text('Every $currentFrequency days'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showBackupFrequencyDialog(context, settingsService);
-                    },
-                  ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
+              value: ThemeMode.light,
+              groupValue: themeService.themeMode,
+              onChanged: (value) {
+                if (value != null) {
+                  themeService.setThemeMode(value);
                   Navigator.pop(context);
-                  this.setState(() {});
-                },
-                child: const Text('Done'),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-  
-  void _showBackupFrequencyDialog(BuildContext context, SettingsService settingsService) {
-    final options = [1, 3, 7, 14, 30];
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Backup Frequency'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: options.map((days) {
-            return ListTile(
-              title: Text('Every $days days'),
-              onTap: () async {
-                await settingsService.setBackupFrequency(days);
-                Navigator.pop(context);
-                setState(() {});
+                }
               },
-            );
-          }).toList(),
+            ),
+            RadioListTile<ThemeMode>(
+              title: const Text('Dark'),
+              value: ThemeMode.dark,
+              groupValue: themeService.themeMode,
+              onChanged: (value) {
+                if (value != null) {
+                  themeService.setThemeMode(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: const Text('System'),
+              subtitle: const Text('Follow system setting'),
+              value: ThemeMode.system,
+              groupValue: themeService.themeMode,
+              onChanged: (value) {
+                if (value != null) {
+                  themeService.setThemeMode(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
   }
-  
-  void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
-      context: context,
-      applicationName: 'Aether',
-      applicationVersion: '1.0.0',
-      applicationIcon: const FlutterLogo(size: 48),
-      applicationLegalese: '© 2025 Aether App',
-      children: const [
-        SizedBox(height: 16),
-        Text(
-          'Aether is a mobile-first note and task management app with hierarchical organization.',
-        ),
-      ],
-    );
-  }
-  
-  String _getSortOptionText(SortOption option) {
-    switch (option) {
-      case SortOption.nameAsc:
-        return 'Name (A-Z)';
-      case SortOption.nameDesc:
-        return 'Name (Z-A)';
-      case SortOption.dateCreatedAsc:
-        return 'Date Created (Oldest First)';
-      case SortOption.dateCreatedDesc:
-        return 'Date Created (Newest First)';
-      case SortOption.dateModifiedAsc:
-        return 'Date Modified (Oldest First)';
-      case SortOption.dateModifiedDesc:
-        return 'Date Modified (Newest First)';
-      case SortOption.typeAsc:
-        return 'Type (A-Z)';
-      case SortOption.typeDesc:
-        return 'Type (Z-A)';
-    }
-  }
-  
-  String _formatFileSize(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    } else if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    } else if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    } else {
-      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+
+  Future<void> _exportAllData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final contentRepository = Provider.of<ContentRepository>(
+        context,
+        listen: false,
+      );
+      final exportPath = await contentRepository.exportAllData();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Data exported to: $exportPath'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Export failed: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 }

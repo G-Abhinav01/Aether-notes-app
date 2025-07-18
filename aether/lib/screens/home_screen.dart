@@ -22,23 +22,23 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final NavigationService _navigationService = NavigationService();
   final PageController _pageController = PageController();
-  
+
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final contentRepository = Provider.of<ContentRepository>(context);
     final settingsService = Provider.of<SettingsService>(context);
-    
+
     // Reset navigation service to root when on home tab
     if (_currentIndex == 0) {
       _navigationService.navigateToRoot();
     }
-    
+
     return Scaffold(
       appBar: AppBar(
         title: _buildAppBarTitle(),
@@ -71,10 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.description),
             label: 'Notes',
@@ -83,25 +80,24 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.check_circle),
             label: 'Tasks',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.delete),
-            label: 'Trash',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.delete), label: 'Trash'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
           ),
         ],
       ),
-      floatingActionButton: _currentIndex < 3 ? FloatingActionButton(
-        onPressed: () {
-          _showCreateContentDialog(context);
-        },
-        child: const Icon(Icons.add),
-      ) : null, // Don't show FAB on trash or settings tabs
+      floatingActionButton: _currentIndex < 3
+          ? FloatingActionButton(
+              onPressed: () {
+                _showCreateContentDialog(context);
+              },
+              child: const Icon(Icons.add),
+            )
+          : null, // Don't show FAB on trash or settings tabs
     );
   }
-  
+
   Widget _buildAppBarTitle() {
     switch (_currentIndex) {
       case 0:
@@ -111,7 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           // Show current folder name
           return FutureBuilder<Folder?>(
-            future: Provider.of<ContentRepository>(context).getFolder(breadcrumbs.last!),
+            future: Provider.of<ContentRepository>(
+              context,
+            ).getFolder(breadcrumbs.last!),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Text('Loading...');
@@ -132,30 +130,33 @@ class _HomeScreenState extends State<HomeScreen> {
         return const Text('Aether');
     }
   }
-  
+
   List<Widget> _buildAppBarActions() {
     final List<Widget> actions = [];
-    
+
     // Add search action for content tabs
     if (_currentIndex < 3) {
       actions.add(
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
-            // TODO: Implement search
+            final currentFolderId = _navigationService.currentFolderId;
+            context.push('/search', extra: {'folderId': currentFolderId});
           },
         ),
       );
     }
-    
+
     // Add view toggle for content tabs
     if (_currentIndex < 3) {
       final settingsService = Provider.of<SettingsService>(context);
       final viewMode = settingsService.getViewMode();
-      
+
       actions.add(
         IconButton(
-          icon: Icon(viewMode == ViewMode.list ? Icons.grid_view : Icons.view_list),
+          icon: Icon(
+            viewMode == ViewMode.list ? Icons.grid_view : Icons.view_list,
+          ),
           onPressed: () async {
             await settingsService.setViewMode(
               viewMode == ViewMode.list ? ViewMode.grid : ViewMode.list,
@@ -165,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
-    
+
     // Add sort action for content tabs
     if (_currentIndex < 3) {
       actions.add(
@@ -177,14 +178,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
-    
+
     return actions;
   }
-  
+
   void _showSortOptionsDialog(BuildContext context) {
-    final settingsService = Provider.of<SettingsService>(context, listen: false);
+    final settingsService = Provider.of<SettingsService>(
+      context,
+      listen: false,
+    );
     final currentSortOption = settingsService.getSortOption();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -257,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   void _showCreateContentDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -303,10 +307,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   void _showCreateFolderDialog(BuildContext context) {
     final TextEditingController nameController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -327,14 +331,17 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(
             onPressed: () async {
               if (nameController.text.isNotEmpty) {
-                final contentRepository = Provider.of<ContentRepository>(context, listen: false);
+                final contentRepository = Provider.of<ContentRepository>(
+                  context,
+                  listen: false,
+                );
                 final currentFolderId = _navigationService.currentFolderId;
-                
+
                 await contentRepository.createFolder(
                   name: nameController.text,
                   parentFolderId: currentFolderId,
                 );
-                
+
                 Navigator.pop(context);
                 setState(() {}); // Refresh UI
               }
@@ -345,10 +352,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ).then((_) => nameController.dispose());
   }
-  
+
   void _showCreateNoteDialog(BuildContext context) {
     final TextEditingController nameController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -369,19 +376,20 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(
             onPressed: () async {
               if (nameController.text.isNotEmpty) {
-                final contentRepository = Provider.of<ContentRepository>(context, listen: false);
+                final contentRepository = Provider.of<ContentRepository>(
+                  context,
+                  listen: false,
+                );
                 final currentFolderId = _navigationService.currentFolderId;
-                
+
                 final note = await contentRepository.createNote(
                   name: nameController.text,
                   content: '',
                   parentFolderId: currentFolderId,
                 );
-                
-                Navigator.pop(context);
-                
-                // Navigate to the note editor
-                if (context.mounted) {
+
+                if (mounted) {
+                  Navigator.pop(context);
                   context.push('/note/${note.id}');
                 }
               }
@@ -392,10 +400,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ).then((_) => nameController.dispose());
   }
-  
+
   void _showCreateTaskDialog(BuildContext context) {
     final TextEditingController nameController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -416,18 +424,19 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(
             onPressed: () async {
               if (nameController.text.isNotEmpty) {
-                final contentRepository = Provider.of<ContentRepository>(context, listen: false);
+                final contentRepository = Provider.of<ContentRepository>(
+                  context,
+                  listen: false,
+                );
                 final currentFolderId = _navigationService.currentFolderId;
-                
+
                 final task = await contentRepository.createTask(
                   name: nameController.text,
                   parentFolderId: currentFolderId,
                 );
-                
-                Navigator.pop(context);
-                
-                // Navigate to the task editor
-                if (context.mounted) {
+
+                if (mounted) {
+                  Navigator.pop(context);
                   context.push('/task/${task.id}');
                 }
               }
@@ -438,7 +447,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ).then((_) => nameController.dispose());
   }
-  
+
   void _showImagePickerDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -468,17 +477,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedImage = await picker.pickImage(source: source);
-    
+
     if (pickedImage != null && context.mounted) {
       // Show dialog to name the image
       final TextEditingController nameController = TextEditingController(
         text: pickedImage.name,
       );
-      
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -499,17 +508,20 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () async {
                 if (nameController.text.isNotEmpty) {
-                  final contentRepository = Provider.of<ContentRepository>(context, listen: false);
+                  final contentRepository = Provider.of<ContentRepository>(
+                    context,
+                    listen: false,
+                  );
                   final currentFolderId = _navigationService.currentFolderId;
-                  
+
                   final imageItem = await contentRepository.createImageItem(
                     pickedImage: pickedImage,
                     name: nameController.text,
                     parentFolderId: currentFolderId,
                   );
-                  
+
                   Navigator.pop(context);
-                  
+
                   // Navigate to the image viewer if image was created successfully
                   if (imageItem != null && context.mounted) {
                     context.push('/image/${imageItem.id}');
@@ -527,7 +539,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class FolderContentsScreen extends StatefulWidget {
   final String? folderId;
-  
+
   const FolderContentsScreen({super.key, this.folderId});
 
   @override
@@ -540,20 +552,20 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
     final contentRepository = Provider.of<ContentRepository>(context);
     final settingsService = Provider.of<SettingsService>(context);
     final viewMode = settingsService.getViewMode();
-    
+
     return FutureBuilder<List<ContentItem>>(
       future: contentRepository.getItemsByFolder(widget.folderId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        
+
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
-        
+
         final items = snapshot.data ?? [];
-        
+
         if (items.isEmpty) {
           return const Center(
             child: Column(
@@ -563,15 +575,18 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
                 SizedBox(height: 16),
                 Text('This folder is empty'),
                 SizedBox(height: 8),
-                Text('Tap + to create content', style: TextStyle(color: Colors.grey)),
+                Text(
+                  'Tap + to create content',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ],
             ),
           );
         }
-        
+
         // Sort items based on settings
         _sortItems(items, settingsService.getSortOption());
-        
+
         // Display items based on view mode
         return viewMode == ViewMode.list
             ? _buildListView(items)
@@ -579,7 +594,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
       },
     );
   }
-  
+
   Widget _buildListView(List<ContentItem> items) {
     return ListView.builder(
       itemCount: items.length,
@@ -589,7 +604,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
       },
     );
   }
-  
+
   Widget _buildGridView(List<ContentItem> items) {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -603,7 +618,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
       },
     );
   }
-  
+
   Widget _buildContentListItem(ContentItem item) {
     return ListTile(
       title: Text(item.name),
@@ -613,10 +628,12 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
       ),
       leading: _getIconForContentType(item.type),
       onTap: () => _handleItemTap(item),
-      trailing: item.isFavorite ? const Icon(Icons.star, color: Colors.amber) : null,
+      trailing: item.isFavorite
+          ? const Icon(Icons.star, color: Colors.amber)
+          : null,
     );
   }
-  
+
   Widget _buildContentGridItem(ContentItem item) {
     return Card(
       margin: const EdgeInsets.all(8.0),
@@ -648,7 +665,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
       ),
     );
   }
-  
+
   Widget _getIconForContentType(ContentType type, {double size = 24}) {
     switch (type) {
       case ContentType.folder:
@@ -661,12 +678,15 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
         return Icon(Icons.image, size: size);
     }
   }
-  
+
   void _handleItemTap(ContentItem item) {
     switch (item.type) {
       case ContentType.folder:
         // Navigate to folder
-        Provider.of<NavigationService>(context, listen: false).navigateToFolder(item.id);
+        Provider.of<NavigationService>(
+          context,
+          listen: false,
+        ).navigateToFolder(item.id);
         context.push('/folder/${item.id}');
         break;
       case ContentType.note:
@@ -683,7 +703,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
         break;
     }
   }
-  
+
   void _sortItems(List<ContentItem> items, SortOption sortOption) {
     switch (sortOption) {
       case SortOption.nameAsc:
@@ -711,7 +731,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
         items.sort((a, b) => b.type.index.compareTo(a.type.index));
         break;
     }
-    
+
     // Always put folders first
     items.sort((a, b) {
       if (a.type == ContentType.folder && b.type != ContentType.folder) {
@@ -722,7 +742,7 @@ class _FolderContentsScreenState extends State<FolderContentsScreen> {
       return 0;
     });
   }
-  
+
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }

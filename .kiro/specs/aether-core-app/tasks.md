@@ -150,6 +150,8 @@
   - _Requirements: 2.3, 2.5, 2.6_
 
 - [ ] 13. Implement search functionality
+
+
   - Create SearchService class with content indexing
   - Build search bar widget with contextual scope detection
   - Implement search query parsing (# prefix for filename-only search)

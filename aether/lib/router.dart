@@ -3,12 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:aether/repositories/content_repository.dart';
 import 'package:aether/services/navigation_service.dart';
 
-// Placeholder screens - these will be replaced with actual implementations
+// Screen imports
 import 'package:aether/screens/home_screen.dart';
 import 'package:aether/screens/folder_screen.dart';
 import 'package:aether/screens/note_screen.dart';
 import 'package:aether/screens/task_screen.dart';
 import 'package:aether/screens/image_screen.dart';
+import 'package:aether/screens/search_screen.dart';
 import 'package:aether/screens/recent_notes_screen.dart';
 import 'package:aether/screens/recent_tasks_screen.dart';
 import 'package:aether/screens/trash_screen.dart';
@@ -84,6 +85,18 @@ class AppRouter {
 
       // Trash route
       GoRoute(path: '/trash', builder: (context, state) => const TrashScreen()),
+
+      // Search route
+      GoRoute(
+        path: '/search',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return SearchScreen(
+            initialQuery: extra?['query'],
+            folderId: extra?['folderId'],
+          );
+        },
+      ),
 
       // Settings route
       GoRoute(
